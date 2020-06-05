@@ -83,7 +83,7 @@ function c()
 
   var fHI = calcHI( fTempF, fRH );
 
-  document.getElementById('dp').value = fDP;
+  document.getElementById('dp').value = fDP.toFixed(2);
   document.getElementById('hi').value = fHI.toFixed(2);
 }
 
