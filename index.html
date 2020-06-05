@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+</head>
+<body>
+
+<table>
+<tr>
+<td>
+Temperature
+</td>
+<td>
+<input id="temp" type="number" value="68"/>degF
+</td>
+</tr>
+<tr>
+<td>
+RH %
+</td>
+<td>
+<input id="rh" type="number" value="50"/>
+</td>
+</tr>
+</table>
+
+<p><b>Heat Index: <input id="hi" type="number" value="-"/></b></p>
+<p><b>Dew Point: <input id="dp" type="number" value="-"/></b></p>
+
+</body>
+<script>
+//https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml
+function calcHI( T, RH )
+{
+  var HI = 0;
+  if( T < 80 )
+  {
+    HI = 0.5 * (T + 61.0 + ((T-68.0)*1.2) + (RH*0.094));
+  }
+  else
+  {
+    HI = -42.379 + 2.04901523*T + 10.14333127*RH - .22475541*T*RH - .00683783*T*T - .05481717*RH*RH + .00122874*T*T*RH + .00085282*T*RH*RH - .00000199*T*T*RH*RH;
+    if( RH < 13 && T > 80 && T < 112 )
+    {
+      HI -= ( (13 - RH) / 4 ) * Math.sqrt( (17 - Math.abs(T - 95) ) / 17 )
+    }
+    else if( RH > 85 && T > 80 && T < 87 )
+    {
+      HI += ((RH - 85) / 10) * ((87 - T) / 5)
+      
+    }
+  }
+  return HI;
+}
+
+function c()
+{
+  try
+  {
+    var fTempF = parseFloat( document.getElementById('temp').value );
+    var fRH = parseFloat( document.getElementById('rh').value );
+  }
+  catch(e)
+  {
+    document.getElementById('dp').value = "-";
+    document.getElementById('hi').value = "-";
+    return;
+  }
+  
+  if( fTempF == NaN || fRH == NaN )
+  {
+    document.getElementById('dp').value = "-";
+    document.getElementById('hi').value = "-";
+    return;
+  }
+
+  var fTempC = ( fTempF - 32.0 ) * 5.0 / 9.0;
+  //var fDP = fTempF - ((100 - fRH)/5);
+  
+  var fDPc = 243.04*(Math.log(fRH/100)+((17.625*fTempC)/(243.04+fTempC)))/(17.625- Math.log(fRH/100)-((17.625*fTempC)/(243.04+fTempC)));
+  var fDP = fDPc * 9.0 / 5.0 + 32;
+
+  var fHI = calcHI( fTempF, fRH );
+
+  document.getElementById('dp').value = fDP;
+  document.getElementById('hi').value = fHI.toFixed(2);
+}
+
+document.getElementById('temp').addEventListener('input', function(evt){ c(); });
+document.getElementById('rh').addEventListener('input', function(evt){ c(); });
+
+document.getElementById('temp').addEventListener('focus', function(evt)
+  { document.getElementById('temp').select() });
+
+document.getElementById('rh').addEventListener('focus', function(evt)
+  { document.getElementById('rh').select() });
+
+</script>
+</html>
