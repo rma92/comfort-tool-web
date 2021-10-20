@@ -7,7 +7,7 @@
 input
 {
   font-size: 20px;
-  width: 56px;
+  width: 50px;
 }
 body
 {
@@ -16,6 +16,24 @@ body
 #hi, #hiC
 {
   background-color: #afa;
+}
+td button
+{
+  touch-action: manipulation;
+  font-size: 20px;
+  margin:0;
+  padding:0;
+  align: center;
+  width: 64px;
+  height: 24px;
+}
+#tempFUp, #tempCUp, #rhUp
+{
+  color: red;
+}
+#tempFDown, #tempCDown, #rhDown
+{
+  color: blue;
 }
 </style>
 </head>
@@ -27,10 +45,14 @@ body
 Temperature
 </td>
 <td>
-<input id="temp" type="number" value="68"/>&deg;F
+<button id="tempFUp">+</button><br/>
+<input id="temp" type="number" value="68" pattern="\d*"/>&deg;F<br/>
+<button id="tempFDown">-</button>
 </td>
 <td>
-<input id="tempC" type="number" value="20"/>&deg;C
+<button id="tempCUp">+</button><br/>
+<input id="tempC" type="number" value="20" pattern="\d*"/>&deg;C<br/>
+<button id="tempCDown">-</button>
 </td>
 </tr>
 <tr>
@@ -38,13 +60,15 @@ Temperature
 RH %
 </td>
 <td>
-<input id="rh" type="number" value="50"/>
+<button id="rhUp">+</button><br/>
+<input id="rh" type="number" value="50" pattern="\d*"/><br/>
+<button id="rhDown">-</button>
 </td>
 </tr>
 </table>
 
-<p><b>Heat Index: <input id="hi" type="number" value="-"/>&deg;F <input id="hiC" type="number" value="-"/>&deg;C </b></p>
-<p><b>Dew Point: <input id="dp" type="number" value="-"/>&deg;F <input id="dpC" type="number" value="-"/>&deg;C</b></p>
+<p><b>Heat Index: <input id="hi" type="number" value="-" readonly/>&deg;F <input id="hiC" type="number" value="-" readonly/>&deg;C </b></p>
+<p><b>Dew Point: <input id="dp" type="number" value="-" readonly/>&deg;F <input id="dpC" type="number" value="-" readonly/>&deg;C</b></p>
 
 </body>
 <script>
@@ -83,9 +107,9 @@ function calcHI( T, RH )
 function doCalculation(fTempF, fRH)
 {
   var fTempC = fToC( fTempF );
-
-  var fDPc = 243.04*(Math.log(fRH/100)+((17.625*fTempC)/(243.04+fTempC)))/(17.625- Math.log(fRH/100)-((17.625*fTempC)/(243.04+fTempC)));
-  var fDP = cToF( fDPc * 9.0 / 5.0 );
+  console.log( fTempC );
+  var fDPc = 243.04 * (Math.log( fRH /100 ) + ((17.625 * fTempC )/(243.04+ fTempC )))/(17.625- Math.log( fRH/100)-((17.625* fTempC)/(243.04+ fTempC ))) 
+  var fDP = cToF( fDPc );
 
   var fHI = calcHI( fTempF, fRH );
 
@@ -177,5 +201,18 @@ document.getElementById('tempC').addEventListener('focus', function(evt)
 document.getElementById('rh').addEventListener('focus', function(evt)
   { document.getElementById('rh').select() });
 
+//buttons
+document.getElementById('tempFUp').addEventListener('click', function(evt)
+  { document.getElementById('temp').value = parseInt(document.getElementById('temp').value) + 1; handleFInput()});
+document.getElementById('tempFDown').addEventListener('click', function(evt)
+  { document.getElementById('temp').value = parseInt(document.getElementById('temp').value) - 1; handleFInput() });
+document.getElementById('tempCUp').addEventListener('click', function(evt)
+  { document.getElementById('tempC').value = parseInt(document.getElementById('tempC').value) + 1; handleCInput() });
+document.getElementById('tempCDown').addEventListener('click', function(evt)
+  { document.getElementById('tempC').value = parseInt(document.getElementById('tempC').value) - 1; handleCInput() });
+document.getElementById('rhUp').addEventListener('click', function(evt)
+  { document.getElementById('rh').value = parseInt(document.getElementById('rh').value) + 1; handleFInput()});
+document.getElementById('rhDown').addEventListener('click', function(evt)
+  { document.getElementById('rh').value = parseInt(document.getElementById('rh').value) - 1; handleFInput() });
 </script>
 </html>
