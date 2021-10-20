@@ -2,7 +2,15 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width">
-  <meta name = "viewport" content = "user-scalable=no, width=device-width">
+  <meta name="viewport" content = "user-scalable=no, width=device-width">
+<style>
+input
+{
+  font-size: 24px;
+  width: 80px;
+}
+
+</style>
 </head>
 <body>
 
@@ -13,6 +21,9 @@ Temperature
 </td>
 <td>
 <input id="temp" type="number" value="68"/>degF
+</td>
+<td>
+<input id="tempC" type="number" value="20"/>degC
 </td>
 </tr>
 <tr>
@@ -54,30 +65,10 @@ function calcHI( T, RH )
   return HI;
 }
 
-function c()
+function doCalculation(fTempF, fRH)
 {
-  try
-  {
-    var fTempF = parseFloat( document.getElementById('temp').value );
-    var fRH = parseFloat( document.getElementById('rh').value );
-  }
-  catch(e)
-  {
-    document.getElementById('dp').value = "-";
-    document.getElementById('hi').value = "-";
-    return;
-  }
-  
-  if( fTempF == NaN || fRH == NaN )
-  {
-    document.getElementById('dp').value = "-";
-    document.getElementById('hi').value = "-";
-    return;
-  }
-
   var fTempC = ( fTempF - 32.0 ) * 5.0 / 9.0;
-  //var fDP = fTempF - ((100 - fRH)/5);
-  
+
   var fDPc = 243.04*(Math.log(fRH/100)+((17.625*fTempC)/(243.04+fTempC)))/(17.625- Math.log(fRH/100)-((17.625*fTempC)/(243.04+fTempC)));
   var fDP = fDPc * 9.0 / 5.0 + 32;
 
@@ -86,12 +77,58 @@ function c()
   document.getElementById('dp').value = fDP.toFixed(2);
   document.getElementById('hi').value = fHI.toFixed(2);
 }
+//input made on degF box or RH;
+function handleFInput()
+{
+  try
+  {
+    var fTempF = parseFloat( document.getElementById('temp').value );
+    var fRH = parseFloat( document.getElementById('rh').value );
+  }
+  catch(e)
+  {
+    //document.getElementById('dp').value = "-";
+    //document.getElementById('hi').value = "-";
+    return;
+  }
+  
+  if( fTempF == NaN || fRH == NaN )
+  {
+    //document.getElementById('dp').value = "-";
+    //document.getElementById('hi').value = "-";
+    return;
+  }
 
-document.getElementById('temp').addEventListener('input', function(evt){ c(); });
-document.getElementById('rh').addEventListener('input', function(evt){ c(); });
+  var fTempC = parseFloat( (( fTempF - 32.0 ) * 5.0 / 9.0 ).toFixed(2) );
+  document.getElementById('tempC').value = fTempC;
+  doCalculation( fTempF, fRH );
+}
+
+function handleCInput()
+{
+  try
+  {
+    var fTempC = parseFloat( document.getElementById('tempC').value );
+    var fRH = parseFloat( document.getElementById('rh').value );
+  }
+  catch(e)
+  {
+    
+  }
+  var fTempF = parseFloat( ((fTempC * 9.0 / 5.0 ) + 32 ).toFixed(2) );
+  document.getElementById('temp').value = fTempF;
+  doCalculation( fTempF, fRH );
+}
+
+document.getElementById('temp').addEventListener('input', function(evt){ handleFInput(); });
+document.getElementById('rh').addEventListener('input', function(evt){ handleFInput(); });
+document.getElementById('tempC').addEventListener('input', function(evt){ handleCInput(); });
 
 document.getElementById('temp').addEventListener('focus', function(evt)
   { document.getElementById('temp').select() });
+
+document.getElementById('tempC').addEventListener('focus', function(evt)
+  { document.getElementById('tempC').select() });
 
 document.getElementById('rh').addEventListener('focus', function(evt)
   { document.getElementById('rh').select() });
