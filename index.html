@@ -6,10 +6,17 @@
 <style>
 input
 {
-  font-size: 24px;
-  width: 80px;
+  font-size: 20px;
+  width: 56px;
 }
-
+body
+{
+  overflow: hidden;
+}
+#hi, #hiC
+{
+  background-color: #afa;
+}
 </style>
 </head>
 <body>
@@ -20,10 +27,10 @@ input
 Temperature
 </td>
 <td>
-<input id="temp" type="number" value="68"/>degF
+<input id="temp" type="number" value="68"/>&deg;F
 </td>
 <td>
-<input id="tempC" type="number" value="20"/>degC
+<input id="tempC" type="number" value="20"/>&deg;C
 </td>
 </tr>
 <tr>
@@ -36,11 +43,19 @@ RH %
 </tr>
 </table>
 
-<p><b>Heat Index: <input id="hi" type="number" value="-"/></b></p>
-<p><b>Dew Point: <input id="dp" type="number" value="-"/></b></p>
+<p><b>Heat Index: <input id="hi" type="number" value="-"/>&deg;F <input id="hiC" type="number" value="-"/>&deg;C </b></p>
+<p><b>Dew Point: <input id="dp" type="number" value="-"/>&deg;F <input id="dpC" type="number" value="-"/>&deg;C</b></p>
 
 </body>
 <script>
+function cToF( fTempC )
+{
+  return ((fTempC * 9.0 / 5.0 ) + 32);
+}
+function fToC( fTempF )
+{
+  return (( fTempF - 32.0 ) * 5.0 / 9.0);
+}
 //https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml
 function calcHI( T, RH )
 {
@@ -67,15 +82,44 @@ function calcHI( T, RH )
 
 function doCalculation(fTempF, fRH)
 {
-  var fTempC = ( fTempF - 32.0 ) * 5.0 / 9.0;
+  var fTempC = fToC( fTempF );
 
   var fDPc = 243.04*(Math.log(fRH/100)+((17.625*fTempC)/(243.04+fTempC)))/(17.625- Math.log(fRH/100)-((17.625*fTempC)/(243.04+fTempC)));
-  var fDP = fDPc * 9.0 / 5.0 + 32;
+  var fDP = cToF( fDPc * 9.0 / 5.0 );
 
   var fHI = calcHI( fTempF, fRH );
 
   document.getElementById('dp').value = fDP.toFixed(2);
+  document.getElementById('dpC').value = fDPc.toFixed(2);  
   document.getElementById('hi').value = fHI.toFixed(2);
+  document.getElementById('hiC').value = fToC( fHI ).toFixed(2);
+  
+  //colors
+  if( fHI < 80 )
+  {
+    document.getElementById('hi').style.backgroundColor = "#bfb";
+    document.getElementById('hiC').style.backgroundColor = "#bfb";
+  }
+  else if( fHI < 90 )
+  {
+    document.getElementById('hi').style.backgroundColor = "#bf0";
+    document.getElementById('hiC').style.backgroundColor = "#bf0";
+  }
+  else if( fHI < 105 )
+  {
+    document.getElementById('hi').style.backgroundColor = "#ff0";
+    document.getElementById('hiC').style.backgroundColor = "#ff0";
+  }
+  else if( fHI < 125 )
+  {
+    document.getElementById('hi').style.backgroundColor = "#fb0";
+    document.getElementById('hiC').style.backgroundColor = "#fb0";
+  }
+  else
+  {
+    document.getElementById('hi').style.backgroundColor = "#fbb";
+    document.getElementById('hiC').style.backgroundColor = "#fbb";
+  }
 }
 //input made on degF box or RH;
 function handleFInput()
@@ -99,7 +143,7 @@ function handleFInput()
     return;
   }
 
-  var fTempC = parseFloat( (( fTempF - 32.0 ) * 5.0 / 9.0 ).toFixed(2) );
+  var fTempC = parseFloat( ( fToC( fTempF ) ).toFixed(2) );
   document.getElementById('tempC').value = fTempC;
   doCalculation( fTempF, fRH );
 }
@@ -115,7 +159,7 @@ function handleCInput()
   {
     
   }
-  var fTempF = parseFloat( ((fTempC * 9.0 / 5.0 ) + 32 ).toFixed(2) );
+  var fTempF = parseFloat( ( cToF( fTempC ) ).toFixed(2) );
   document.getElementById('temp').value = fTempF;
   doCalculation( fTempF, fRH );
 }
